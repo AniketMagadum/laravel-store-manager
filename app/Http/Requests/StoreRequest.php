@@ -25,8 +25,15 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => 'required',
+            'category_id'=>'required',
             'address' => 'required',
             'description' => 'required',
+        ];
+    }
+
+    public function messages(){
+        return [
+            "category_id"=>"The category field is required"
         ];
     }
 }

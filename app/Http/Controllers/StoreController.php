@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Store;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreRequest;
+use App\StoreCategory;
 class StoreController extends Controller
 {
+
     public function __construct(){
         $this->middleware('auth');
     }
@@ -18,14 +20,14 @@ class StoreController extends Controller
     public function index(Request $request)
     {   
         if($request->ajax()){
-            $stores=Store::paginate(15,['*'],'page',$request->get('page'));
+            $stores=Store::with('category:id,name')->paginate(15,['*'],'page',$request->get('page'));
             $html=html_entity_decode(trim(preg_replace('/\s\s+/', ' ',$stores->links())));
             return [
                 "stores"=>$stores,
                 "html"=>$html
             ];
         }else{
-             $stores=Store::paginate(15);
+             $stores=Store::with('category:id,name')->paginate(15);
              return view('store.index',compact('stores'));
         } 
     }
@@ -37,7 +39,8 @@ class StoreController extends Controller
      */
     public function create()
     {
-        return view('store.form');
+        $categories_options= StoreCategory::select('id','name')->get();
+        return view('store.form',compact('categories_options'));
     }
 
     /**
@@ -73,7 +76,8 @@ class StoreController extends Controller
      */
     public function edit(Store $store)
     {
-        return view('store.form',["store"=>$store]);
+        $categories_options= StoreCategory::select('id','name')->get();
+        return view('store.form',["store"=>$store,"categories_options"=>$categories_options]);
     }
 
     /**

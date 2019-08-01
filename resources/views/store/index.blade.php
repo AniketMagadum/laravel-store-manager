@@ -2,13 +2,8 @@
 @section('content')
 <div class="container">
 <div class="row ">
-  <div class="col-md-3">
+  <div class="col-md-9">
       <a class="btn btn-success mb-3" href="{{route('stores.create')}}" >Create Store</a>
-  </div>
-  <div class="col-md-6">
-      <div class="input-group">
-        <input type="search" class="form-control" id="search_inp" placeholder="Search ..">
-      </div>
   </div>
   <div class="col-md-3" id="pagination-btn">
     {{$stores->links()}}
@@ -51,6 +46,7 @@
           dataType: 'json',
           url:url,
           success:function(response){
+            console.log(response);
             $("#pagination-btn").html(response.html);
             var tabledata="";
             response.stores.data.forEach(store => {
@@ -59,6 +55,7 @@
               tabledata+=`<tr>
                 <th scope="row">${store.id}</th>
                 <td><a href="${url}">${store.name}</a></td>
+                <td>${store.category.name}</td>
                 <td>${store.address}</td>
                 <td>${store.description}</td>
                 </tr>`;

@@ -24,6 +24,24 @@
     @enderror
   </div>
   <div class="form-group">
+    <label for="category_id">Category:</label>
+    <select class="form-control" id="category_id" name="category_id">
+      <option value="">Select Category</option>
+      @foreach($categories_options as $option)
+        @php
+          $selectedText="";
+          if(isset($store) && $store->category_id==$option->id && $selectedText==""){
+            $selectedText="selected";
+          }
+        @endphp
+        <option value="{{$option->id}}" {{$selectedText}}>{{$option->name}}</option>
+      @endforeach 
+    </select>
+    @error('category_id')
+    <p class="text-danger">{{ $message }}</p>
+    @enderror
+  </div>
+  <div class="form-group">
     <label for="description">Store Description</label>
     <textarea class="form-control" id="description" name="description" rows="3">{{$store->description??old('description')}}</textarea>
     @error('description')
