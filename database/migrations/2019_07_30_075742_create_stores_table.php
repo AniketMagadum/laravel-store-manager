@@ -15,13 +15,13 @@ class CreateStoresTable extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('store_category_id');
+            $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->text('description');
             $table->text('address');
             $table->boolean('is_published');
             $table->timestamps();
-            $table->foreign('store_category_id')->references('id')->on('store_categories');
+            $table->foreign('category_id')->references('id')->on('store_categories');
         });
     }
 

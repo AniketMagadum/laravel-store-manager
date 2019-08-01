@@ -19,6 +19,7 @@
     <tr>
       <th scope="col">#</th>
       <th scope="col">Name</th>
+      <th scope="col">Category</th>
       <th scope="col">Address</th>
       <th scope="col">Description</th>
     </tr>
@@ -29,6 +30,7 @@
       <tr>
         <th scope="row">{{$store->id}}</th>
         <td><a href="{{route('stores.edit',['store'=>$store])}}">{{$store->name}}</a></td>
+        <td>{{$store->category->name}}</td>
         <td>{{$store->address}}</td>
         <td>{{$store->description}}</td>
       </tr>
