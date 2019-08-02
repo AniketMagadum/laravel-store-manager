@@ -21,13 +21,25 @@ class StoreController extends Controller
     {   
         if($request->ajax()){
             $stores=Store::with('category:id,name')->paginate(15,['*'],'page',$request->get('page'));
+            foreach($stores as $store){
+                $store->created_by="Not available";
+                $store->updated_by="Not available";
+                foreach($store->revisionHistory as $history){
+                    if($history->key == 'created_at' && !$history->old_value){
+                        $store->created_by=$history->userResponsible()->name;
+                    }else{
+                        $store->updated_by=$history->userResponsible()->name;
+                    }
+                }
+            }
+
             $html=html_entity_decode(trim(preg_replace('/\s\s+/', ' ',$stores->links())));
             return [
                 "stores"=>$stores,
                 "html"=>$html
             ];
         }else{
-             $stores=Store::with('category:id,name')->paginate(15);
+             $stores=Store::with('category:id,name','revisionHistory')->paginate(15);
              return view('store.index',compact('stores'));
         } 
     }
@@ -65,6 +77,7 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
+        
         return view('store.show',["store"=>$store]);
     }
 

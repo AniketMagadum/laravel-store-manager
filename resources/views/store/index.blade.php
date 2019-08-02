@@ -23,6 +23,8 @@
       <th scope="col">Category</th>
       <th scope="col">Address</th>
       <th scope="col">Description</th>
+      <th scope="col">Created by</th>
+      <th scope="col">Updated by</th>
     </tr>
   </thead>
   <tbody id="stores_table">
@@ -34,6 +36,33 @@
         <td>{{$store->category->name}}</td>
         <td>{{$store->address}}</td>
         <td>{{$store->description}}</td>
+        <td>
+        @if(count($store->revisionHistory)>0)
+          @foreach($store->revisionHistory as $history)
+            @if($history->key == 'created_at' && !$history->old_value)
+            {{ $history->userResponsible()->name }}
+            @break
+            @endif
+            @if($loop->last)
+              Not available
+            @endif
+          @endforeach
+        @else
+        Not avaiable
+        @endif
+      </td>
+      <td>
+        @if(count($store->revisionHistory)>0)
+          @foreach($store->revisionHistory as $history)
+            @if($history->key != 'created_at')
+            {{ $history->userResponsible()->name}}
+            @break
+            @endif
+          @endforeach
+        @else
+         Not available
+        @endif
+      </td>
       </tr>
     @endforeach
 
@@ -55,15 +84,25 @@
             console.log(response);
             $("#pagination-btn").html(response.html);
             var tabledata="";
+            var created_by="Not Avaiable";
             response.stores.data.forEach(store => {
               var url = '{{ route("stores.edit", ":id") }}';
               url = url.replace(':id', store.id);
+              if(store.revision_history.length>0){
+                store.revision_history.forEach(history => {
+                  if(history.key=="created_at"){
+                    created_by=history.user_id;
+                  }
+              });
+              }
               tabledata+=`<tr>
                 <th scope="row">${store.id}</th>
                 <td><a href="${url}">${store.name}</a></td>
                 <td>${store.category.name}</td>
                 <td>${store.address}</td>
                 <td>${store.description}</td>
+                <td>${store.created_by}</td>
+                <td>${store.updated_by}</td>
                 </tr>`;
             });
             $("#stores_table").html(tabledata);
@@ -95,7 +134,7 @@
           });
           var url='{{route("stores.destroy", ":id")}}';
           url = url.replace(':id', selected_rows);
-          console.log(url);
+          
           $.ajax({
             type:'delete',
             data:{"ids":selected_rows,"_token": "{{ csrf_token() }}"},
