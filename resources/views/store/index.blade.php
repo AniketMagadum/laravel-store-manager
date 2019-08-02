@@ -1,9 +1,15 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 <div class="row ">
-  <div class="col-md-9">
-      <a class="btn btn-success mb-3" href="{{route('stores.create')}}" >Create Store</a>
+  <div class="col-md-9  mb-3">
+      <a class="btn btn-success" href="{{route('stores.create')}}" >Create Store</a>
+      <button class="btn btn-danger" id="delete_selected_btn">Delete Selected</button>
   </div>
   <div class="col-md-3" id="pagination-btn">
     {{$stores->links()}}
@@ -12,7 +18,7 @@
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th scope="col">#</th>
+      <th scope="col"><input type="checkbox" id="select_all_checkbox"></th>
       <th scope="col">Name</th>
       <th scope="col">Category</th>
       <th scope="col">Address</th>
@@ -23,7 +29,7 @@
 
     @foreach ($stores as $store)
       <tr>
-        <th scope="row">{{$store->id}}</th>
+        <th scope="row"><input type="checkbox" class="row_checkbox" value="{{$store->id}}"></th>
         <td><a href="{{route('stores.edit',['store'=>$store])}}">{{$store->name}}</a></td>
         <td>{{$store->category->name}}</td>
         <td>{{$store->address}}</td>
@@ -70,6 +76,40 @@
             var searchText=$(this).val();
             alert(searchText);
         }
+      });
+
+      $("#select_all_checkbox").click(function(){
+          if($(this).is(':checked')){
+            $(".row_checkbox").attr('checked',true);
+            return;
+          }
+          $(".row_checkbox").attr('checked',false);
+      });
+
+      $("#delete_selected_btn").click(function(){
+          var selected_rows=[];
+          $(".row_checkbox").each(function(index){
+              if(this.checked==true){
+                selected_rows.push(this.value);
+              }
+          });
+          var url='{{route("stores.destroy", ":id")}}';
+          url = url.replace(':id', selected_rows);
+          console.log(url);
+          $.ajax({
+            type:'delete',
+            data:{"ids":selected_rows,"_token": "{{ csrf_token() }}"},
+            url:url,
+            success:function(response){
+              if(response){
+                $(".row_checkbox").each(function(index){
+                  if(this.checked==true){
+                      $(this).closest('tr').remove();
+                  }   
+                });
+              }
+            }
+          });
       });
     });
 </script>

@@ -54,7 +54,7 @@ class StoreController extends Controller
         $store = new Store();
         $store->fill($request->all());
         $store->save();
-        return redirect('stores');
+        return redirect('stores')->with('success', 'Store Created');
     }
 
     /**
@@ -91,7 +91,7 @@ class StoreController extends Controller
     {
         $store->fill($request->all());
         $store->save();
-        return redirect('stores');
+        return redirect('stores')->with('success', 'Store Details Updated');
     }
 
     /**
@@ -100,9 +100,15 @@ class StoreController extends Controller
      * @param  \App\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Store $store)
+    public function destroy(Request $request,Store $store)
     {
-        $store->delete();
-        return redirect('stores');
+        if($request->ajax()){
+            $ids=$request->input('ids');
+            Store::destroy(collect($ids));
+            return 'success';
+        }else{
+            $store->delete();
+            return redirect('stores')->with('success', 'Store Deleted');
+        }
     }
 }
